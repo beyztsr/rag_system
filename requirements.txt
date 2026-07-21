@@ -1,0 +1,12 @@
+fastapi==0.110.0
+uvicorn==0.28.0
+pydantic==2.6.4
+pydantic-settings==2.2.1
+pymupdf==1.24.1
+pytesseract==0.3.10
+Pillow==10.2.0
+chromadb==0.4.24
+langchain-text-splitters==0.0.1
+PyYAML==6.0.1
+requests==2.31.0
+playwright==1.42.0

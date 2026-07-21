@@ -1,0 +1,16 @@
+ollama:
+  base_url: "http://localhost:11434"
+  text_model: "gemma4:31b-cloud"
+  vision_model: "llava"
+  embedding_model: "bge-m3"       # nomic-embed-text yerine Türkçe başarısı yüksek model
+
+vector_store:
+  db_path: "./chroma_db"
+  collection_name: "edefter_docs"
+  provider: "chromadb"
+
+ingest:
+  data_dir: "./data"
+  image_output_dir: "./images"
+  chunk_size: 1000                # 2000'den 1000'e düşürüldü (Daha nokta atışı arama için)
+  chunk_overlap: 150              # 400'den 150'ye düşürüldü

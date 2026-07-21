@@ -1,0 +1,30 @@
+e-Defter Uygulamasının Teknik Mimarisi
+1 Sıra No.lu Elektronik Defter Genel Tebliği düzenlemesi gereğince yevmiye defteri ve büyük defter, XBRL GL e-defter format ve standartlarına göre hazırlanacaktır. Bu standartlar defter kayıtlarının içeriği ve standartlarını belirlemektedir.
+
+Genel Tebliğ düzenlemelerine göre söz konusu standartlara uygun olarak oluşturulan dosyaların e-defter olarak kabul edilebilmesi için mali mühür ile mühürlenmesi ya da güvenli elektronik imza ile imzalanması ve e-Defter Uygulaması aracılığı ile beratının alınması gerekmektedir. Konu ile iligili detaylı açıklamalar e-Defter Paket dosyası içerisinde bulunan e-Defter Teknik Kılavuz dokümanında açıklanmıştır.
+
+E-Defter dosyaları ilgili kılavuzlarda belirtilen standartlar ve formata uygun biçimde hazırlanır.
+Hazırlanan dosya “defter” şema yapısında öngörülen alana yerleştirilir.
+Oluşturulan “defter” dosyası mühürlenir ya da imzalanır. (Bu şekilde oluşturulan dosya, mükellefin beratının aldıktan sonra defter olarak  saklamak zorunda olduğu dosyadır. Ancak bu dosyanın defter olarak geçerli sayılabilmesi için e-defter beratının alınması zorunludur.)
+Mühürlenen ya da imzalanan “defter” dosyasının belli bilgileri alınarak “berat” dosyası oluşturulur.
+Berat dosyası mühürlenir ya da imzalanır.
+Mühürlü ya da imzalı berat dosyası paketlenir.
+Hazırlanan paket edefter.gov.tr adresinde bulunan e-Defter Uygulamasına giriş yapılarak yüklenir ya da web servis aracılığıyla gönderilir.
+Berat dosyası Gelir İdaresi Başkanlığı mali mührü ile de mühürlenerek indirilecek biçimde defter sahibinin erişimine açılır. (Erişime açılan  e-defter beratı ile imzalı veya mühürlü defter dosyası birlikte elektronik ortamda muhafaza edilecektir.)
+📑 e-Defter Oluşturma ve Berat Yükleme Süreci
+1. Uyumluk onayı almış bir yazılım bilgisi verilerek e-Defter uygulamasına dahil olunur.
+2. VUK 219. maddesinde yer alan kayıt sürelerine uygun şekilde muhasebe kayıtları yapılır.
+3. e-Defter, ilgili Tebliğlerde belirlenen süre ve formatta aylık olarak hazırlanır. Oluşturulan e-Defterler, e-Defter Görüntüleyici ile Şema ve Şematron kontrolünden geçirilir.
+4. Gerçek kişiler e-imza veya mali mühür; tüzel kişiler ise mali mühür ile imzalar.
+5. Onaylanan defterin imza/mühür değeri alınır.
+6. e-Defterin imza/mühür değerini taşıyan e-Defter Beratı, mükellef tarafından elektronik ortamda hazırlanarak e-imzalanır/mühürlenir.
+7. e-Defter Beratları, ilgili ayı takip eden 3. ayın sonuna kadar GİB sistemlerine yüklenir.
+8. Web servis aracılığıyla,
+9. GİB e-Defter uygulaması aracılığıyla,
+10. e-Defter Beratı uygulamaya yüklenir.
+11. GİB, uygulamadan gelen e-Defter Beratını kendi mührü ile de onaylar.
+
+📌 Mükellef, e-Defterini, beratını ve uygulamadan indirdiği GİB onaylı beratı yasal saklama süresince muhafaza eder.
+ e-Defter Uygulaması ile 213 sayılı Vergi Usul Kanununun 219 uncu maddesinde hüküm altına alınan muhasebe kayıt zamanına ilişkin bir değişiklik öngörülmemektedir. Kayıtların öteden beri olduğu gibi, Vergi Usul Kanununda belirlenen süreler dahilinde gerçekleştirilmesi gerekmektedir.
+
+ e-Defter Genel Tebliğleri ile öngörülen süreler; e-Defterlerin belirlenen format ve standartta oluşturulması, imzalanması, oluşturulan e-Defterlerin şema ve şematron kontrollerinden geçirilerek gerçekleştirilen muhasebe kayıtlarının tamamının e-Deftere sağlıklı bir şekilde aktırılmış olup olmadığının kontrolü ile e-Defter Berat dosyalarının oluşturulması, imzalanması ve bu beratların Başkanlık sistemine yüklenmesi için öngörülen azami süreyi belirlemektedir. Belirlenen süreler, beyanname ve ödeme sürelerini herhangi bir şekilde etkilememektedir.

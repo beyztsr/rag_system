@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>e-Defter Mevzuat Asistanı</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --chat-bg: #1e293b;
+            --input-bg: #334155;
+            --text-color: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --border-color: #475569;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        header {
+            background-color: var(--chat-bg);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: var(--accent-color);
+        }
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+            padding: 1rem;
+            border-radius: 12px;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+        .user-message {
+            background-color: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+        .assistant-message {
+            background-color: var(--chat-bg);
+            border: 1px solid var(--border-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+        .preview-image {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 8px;
+            margin-top: 8px;
+            object-fit: cover;
+        }
+        #input-container {
+            background-color: var(--chat-bg);
+            padding: 1rem 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+        .input-wrapper {
+            display: flex;
+            gap: 0.75rem;
+            position: relative;
+        }
+        textarea {
+            flex: 1;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-color);
+            font-size: 1rem;
+            resize: none;
+            height: 50px;
+            font-family: inherit;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+        #image-preview-bar {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        #image-preview-bar img {
+            height: 40px;
+            border-radius: 4px;
+        }
+        .sources {
+            margin-bottom: 12px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 8px;
+        }
+        .source-badge {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 6px;
+            margin-top: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>e-Defter Teknik Mevzuat Asistanı</h1>
+        <span style="font-size: 0.85rem; color: var(--text-secondary);">Ollama + ChromaDB RAG</span>
+    </header>
+
+    <div id="chat-container">
+        <div class="message assistant-message">
+            Merhaba! e-Defter kılavuzları ve teknik dokümanlar hakkında bana soru sorabilir veya ekran görüntüsü yapıştırarak yardım alabilirsiniz.
+        </div>
+    </div>
+
+    <div id="input-container">
+        <div id="image-preview-bar">
+            <span>Eklenen Görsel:</span>
+            <img id="thumb-preview" src="" alt="Önizleme">
+            <button onclick="removeImage()" style="padding: 2px 6px; font-size: 0.7rem; background: #ef4444;">Kaldır</button>
+        </div>
+        <div class="input-wrapper">
+            <textarea id="query-input" placeholder="Bir şeyler yazın veya ekran görüntüsü yapıştırın (Ctrl+V)..." rows="1"></textarea>
+            <button onclick="sendMessage()">Gönder</button>
+        </div>
+    </div>
+
+    <script>
+        const sessionId = "session_" + Math.random().toString(36).substring(2, 9);
+        let attachedImageBase64 = null;
+
+        const chatContainer = document.getElementById('chat-container');
+        const queryInput = document.getElementById('query-input');
+        const imagePreviewBar = document.getElementById('image-preview-bar');
+        const thumbPreview = document.getElementById('thumb-preview');
+
+        window.addEventListener('paste', function (e) {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (let item of items) {
+                if (item.type.indexOf('image') === 0) {
+                    const blob = item.getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        attachedImageBase64 = event.target.result;
+                        thumbPreview.src = attachedImageBase64;
+                        imagePreviewBar.style.display = 'flex';
+                    };
+                    reader.readAsDataURL(blob);
+                }
+            }
+        });
+
+        function removeImage() {
+            attachedImageBase64 = null;
+            imagePreviewBar.style.display = 'none';
+            thumbPreview.src = '';
+        }
+
+        async function sendMessage() {
+            const text = queryInput.value.trim();
+            if (!text && !attachedImageBase64) return;
+
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = 'message user-message';
+            let userContentHtml = `<div>${escapeHtml(text)}</div>`;
+            if (attachedImageBase64) {
+                userContentHtml += `<img src="${attachedImageBase64}" class="preview-image">`;
+            }
+            userMsgDiv.innerHTML = userContentHtml;
+            chatContainer.appendChild(userMsgDiv);
+
+            const currentImage = attachedImageBase64;
+            queryInput.value = '';
+            removeImage();
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            const assistantMsgDiv = document.createElement('div');
+            assistantMsgDiv.className = 'message assistant-message';
+            
+            // Kaynaklar için üst alan
+            const sourcesDiv = document.createElement('div');
+            sourcesDiv.className = 'sources';
+            sourcesDiv.style.display = 'none';
+            assistantMsgDiv.appendChild(sourcesDiv);
+
+            // Asistan yanıtı için ana metin alanı
+            const contentSpan = document.createElement('div');
+            assistantMsgDiv.appendChild(contentSpan);
+            chatContainer.appendChild(assistantMsgDiv);
+
+            try {
+                const response = await fetch('http://localhost:8000/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        query: text
+                    })
+                });
+
+                if (!response.ok) throw new Error("Sunucu yanıt vermedi.");
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = "";
+                let accumulatedText = "";
+
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); // Son eksik parçayı bufferda tut
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const jsonStr = line.substring(6).trim();
+                            if (!jsonStr) continue;
+                            try {
+                                const parsed = JSON.parse(jsonStr);
+                                
+                                if (parsed.type === 'sources') {
+                                    if (parsed.data && parsed.data.length > 0) {
+                                        let sourcesHtml = '<strong>KULLANILAN KAYNAKLAR:</strong><br>';
+                                        parsed.data.forEach(src => {
+                                            const sourceName = src.source || src.file_name || 'Doküman';
+                                            const pageNum = src.page ? ` (S. ${src.page})` : '';
+                                            sourcesHtml += `<span class="source-badge">📄 ${sourceName}${pageNum}</span>`;
+                                        });
+                                        sourcesDiv.innerHTML = sourcesHtml;
+                                        sourcesDiv.style.display = 'block';
+                                    }
+                                } else if (parsed.type === 'content') {
+                                    accumulatedText += parsed.data;
+                                    contentSpan.innerHTML = marked.parse(accumulatedText);
+                                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                                } else if (parsed.type === 'error') {
+                                    accumulatedText += `\n❌ Hata: ${parsed.data}`;
+                                    contentSpan.innerHTML = marked.parse(accumulatedText);
+                                }
+                            } catch (e) {
+                                console.error("JSON parse hatası:", e, jsonStr);
+                            }
+                        }
+                    }
+                }
+
+            } catch (err) {
+                contentSpan.innerHTML = "❌ Hata oluştu: Sunucuya bağlanılamadı.";
+            }
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        queryInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
